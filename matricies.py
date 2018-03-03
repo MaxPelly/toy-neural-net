@@ -1,6 +1,5 @@
 from random import uniform
 
-
 class Matrix(object):
     def __init__(self, rows, columns, random=False, rand_min=-1, rand_max=1):
         self.rows = rows
@@ -30,10 +29,6 @@ class Matrix(object):
     def __radd__(self, other):
         return self.__add__(other)
 
-    def add(self, other):
-        output = self + other
-        self.data, self.cols, self.rows = output.data, output.cols, output.rows
-
     def __mul__(self, other):
         output = None
         if isinstance(other, Matrix):
@@ -57,20 +52,61 @@ class Matrix(object):
     def __rmul__(self, other):
         return self.__mul__(other)
 
+    def add(self, other):
+        """
+        adds a number or matrix to the current matrix, changing it in place
+
+        :param other: the thing to add
+        :return: None
+        """
+        output = self + other
+        self.data, self.cols, self.rows = output.data, output.cols, output.rows
+
     def mul(self, other):
+        """
+        multiplies the matrix by a number or matrix, changing it in place
+
+        :param other: the thing to multiply by
+        :return: None
+        """
         output = self * other
         self.data, self.cols, self.rows = output.data, output.cols, output.rows
 
     def randomise(self, rand_min, rand_max):
+        """
+        randomises the matricies values to values between rand_min and rand_max
+
+        :param rand_min: minimum value, int
+        :param rand_max: maximum value, int
+        :return: None
+        """
         for row in range(self.rows):
             for column in range(self.cols):
                 self.data[row][column] = uniform(rand_min, rand_max)
 
     def transpose(self):
+        """
+        transposes the current matrix inplace
+
+        :return: None
+        """
         output = Matrix(self.cols, self.rows)
         for row in range(self.rows):
             for column in range(self.cols):
                 output.data[column][row] = self.data[row][column]
+        return output
+
+    def map(self, f):
+        """
+        applies f to the each of the values in the current matrix, GENERATES A NEW MATRIX WITHOUT ALTERING CURRENT
+
+        :param f: a function to apply to the values, should expect (value, row, column)
+        :return: Matrix
+        """
+        output = Matrix(self.rows, self.cols)
+        for row in range(self.rows):
+            for column in range(self.cols):
+                output.data[row][column] = f(self.data[row][column], row, column)
         return output
 
 
